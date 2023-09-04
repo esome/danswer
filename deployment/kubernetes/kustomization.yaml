@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- api_server-service-deployment.yaml
+- background-deployment.yaml
+- nginx-configmap.yaml
+- nginx-service-deployment.yaml
+- persistent-volumes.yaml
+- postgres-service-deployment.yaml
+- vespa-service-deployment.yaml
+- web_server-service-deployment.yaml
