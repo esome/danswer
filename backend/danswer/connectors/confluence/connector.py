@@ -37,6 +37,14 @@ def extract_confluence_keys_from_url(wiki_url: str) -> tuple[str, str]:
     wiki_base is danswer.atlassian.net/wiki
     space is 1234abcd
     """
+    parsed_url = urlparse(wiki_url)
+    wiki_base = (
+        parsed_url.scheme
+        + "://"
+        + parsed_url.netloc
+    )
+    space = parsed_url.path.split("/")[2]
+    return wiki_base, space
     if ".atlassian.net/wiki/spaces/" not in wiki_url:
         raise ValueError(
             "Not a valid Confluence Wiki Link, unable to extract wiki base and space names"
@@ -91,9 +99,7 @@ class ConfluenceConnector(LoadConnector, PollConnector):
         access_token = credentials["confluence_access_token"]
         self.confluence_client = Confluence(
             url=self.wiki_base,
-            username=username,
-            password=access_token,
-            cloud=True,
+            token=access_token,
         )
         return None
 
@@ -215,6 +221,11 @@ class ConfluenceConnector(LoadConnector, PollConnector):
                 comments_text = self._fetch_comments(self.confluence_client, page["id"])
                 page_text += comments_text
 
+                if "friendlyWhen" in page["version"]:
+                    updated_at = page["version"]["friendlyWhen"]
+                else:
+                    updated_at = page["version"]["when"]
+
                 doc_batch.append(
                     Document(
                         id=page_url,
@@ -223,7 +234,7 @@ class ConfluenceConnector(LoadConnector, PollConnector):
                         semantic_identifier=page["title"],
                         metadata={
                             "Wiki Space Name": self.space,
-                            "Updated At": page["version"]["friendlyWhen"],
+                            "Updated At": updated_at,
                         },
                     )
                 )
