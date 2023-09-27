@@ -11,6 +11,7 @@ import {
   ConfluenceIcon,
   GuruIcon,
   FileIcon,
+  DirectoryIcon,
   JiraIcon,
   SlabIcon,
   NotionIcon,
@@ -189,6 +190,15 @@ export default async function AdminLayout({
                     </div>
                   ),
                   link: "/admin/connectors/file",
+                },
+                {
+                  name: (
+                    <div className="flex">
+                      <DirectoryIcon size={16} />
+                      <div className="ml-1">Directory</div>
+                    </div>
+                  ),
+                  link: "/admin/connectors/directory",
                 },
               ],
             },

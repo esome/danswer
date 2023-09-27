@@ -21,7 +21,8 @@ export type ValidSources =
   | "guru"
   | "zulip"
   | "linear"
-  | "file";
+  | "file"
+  | "directory";
 export type ValidInputTypes = "load_state" | "poll" | "event";
 export type ValidStatuses =
   | "success"
@@ -96,6 +97,9 @@ export interface GuruConfig {}
 
 export interface FileConfig {
   file_locations: string[];
+}
+
+export interface DirectoryConfig {
 }
 
 export interface ZulipConfig {
@@ -201,6 +205,12 @@ export interface LinearCredentialJson {
   linear_api_key: string;
 }
 
+// export interface DirectoryCredentialJson {
+//   bookstack_base_url: string;
+//   bookstack_api_token_id: string;
+//   bookstack_api_token_secret: string;
+// }
+  
 // DELETION
 
 export interface DeletionAttemptSnapshot {

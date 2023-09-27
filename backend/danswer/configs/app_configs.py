@@ -122,6 +122,7 @@ GOOGLE_DRIVE_FOLLOW_SHORTCUTS = False
 FILE_CONNECTOR_TMP_STORAGE_PATH = os.environ.get(
     "FILE_CONNECTOR_TMP_STORAGE_PATH", "/home/file_connector_storage"
 )
+DIRECTORY_CONNECTOR_PATH = os.environ.get("DIRECTORY_CONNECTOR_PATH", "/data")
 # TODO these should be available for frontend configuration, via advanced options expandable
 WEB_CONNECTOR_IGNORED_CLASSES = os.environ.get(
     "WEB_CONNECTOR_IGNORED_CLASSES", "sidebar,footer"

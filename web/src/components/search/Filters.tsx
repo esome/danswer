@@ -16,6 +16,7 @@ const sources: Source[] = [
   { displayName: "Web", internalName: "web" },
   { displayName: "Guru", internalName: "guru" },
   { displayName: "File", internalName: "file" },
+  { displayName: "Directory", internalName: "directory" },
   { displayName: "Notion", internalName: "notion" },
   { displayName: "Zulip", internalName: "zulip" },
   { displayName: "Linear", internalName: "linear" },

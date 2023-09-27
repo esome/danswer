@@ -20,6 +20,7 @@ import {
   FiChevronsUp,
   FiEdit,
   FiFile,
+  FiFolder,
   FiGlobe,
   FiThumbsDown,
   FiThumbsUp,
@@ -115,6 +116,13 @@ export const FileIcon = ({
   className = defaultTailwindCSS,
 }: IconProps) => {
   return <FiFile size={size} className={className} />;
+};
+
+export const DirectoryIcon = ({
+  size = 16,
+  className = defaultTailwindCSS,
+}: IconProps) => {
+  return <FiFolder size={size} className={className} />;
 };
 
 export const InfoIcon = ({
