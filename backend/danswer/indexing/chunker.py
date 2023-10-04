@@ -13,6 +13,9 @@ from danswer.connectors.models import Section
 from danswer.indexing.models import DocAwareChunk
 from danswer.search.search_nlp_models import get_default_tokenizer
 from danswer.utils.text_processing import shared_precompare_cleanup
+from danswer.utils.logger import setup_logger
+
+logger = setup_logger()
 
 
 SECTION_SEPARATOR = "\n\n"
@@ -25,7 +28,11 @@ def extract_blurb(text: str, blurb_size: int) -> str:
         tokenizer=token_count_func, chunk_size=blurb_size, chunk_overlap=0
     )
 
-    return blurb_splitter.split_text(text)[0]
+    split_text = blurb_splitter.split_text(text)
+    if len(split_text) == 0:
+        logger.warning(f"Could not extract blurb from text: {text}")
+        return ""
+    return split_text[0]
 
 
 def chunk_large_section(
