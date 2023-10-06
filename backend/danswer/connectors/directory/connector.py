@@ -25,22 +25,26 @@ logger = setup_logger()
 _METADATA_FLAG = "#DANSWER_METADATA="
 
 LOAD_STATE_KEY = "directory_connector_state"
-MAX_BATCHES = 10
+MAX_BATCHES = 5
+MAX_FILE_SIZE = 1 * 1024 * 1024 # 1 MB
 
 def _open_files_at_location_recursive(
     base_path: str | Path,
     file_path: str | Path,
 ) -> Generator[tuple[str, IO[Any]], Any, None]:
-    for file in os.listdir(os.path.join(base_path, file_path)):
-        rel_file_path = os.path.join(file_path, file)
-        abs_file_path = os.path.join(base_path, rel_file_path)
-        if os.path.isdir(abs_file_path):
+    for file in os.scandir(os.path.join(base_path, file_path)):
+        rel_file_path = os.path.join(file_path, file.name)
+        abs_file_path = file.path
+        if file.is_dir(follow_symlinks=False):
             yield from _open_files_at_location_recursive(base_path, rel_file_path)
-        else:
-            extension = get_file_ext(abs_file_path)
+        elif not file.is_symlink():
+            if file.stat().st_size > MAX_FILE_SIZE:
+                logger.warning(f"Skipping file '{abs_file_path}' as it is too large")
+                continue
+            extension = get_file_ext(file.name)
             if extension == ".txt":
-                with open(abs_file_path, "r", encoding = "utf8") as file:
-                    yield str(rel_file_path), file
+                with open(abs_file_path, "r", encoding = "utf8") as fd:
+                    yield str(rel_file_path), fd
             else:
                 logger.warning(f"Skipping file '{abs_file_path}' with extension '{extension}'")
 
