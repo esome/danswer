@@ -103,7 +103,10 @@ TYPESENSE_HOST = os.environ.get("TYPESENSE_HOST") or "localhost"
 TYPESENSE_PORT = 8108
 TYPESENSE_API_KEY = os.environ.get("TYPESENSE_API_KEY", "")
 # Number of documents in a batch during indexing (further batching done by chunks before passing to bi-encoder)
-INDEX_BATCH_SIZE = 16
+try:
+    INDEX_BATCH_SIZE = int(os.environ.get("INDEX_BATCH_SIZE", "16"))
+except TypeError as e:
+    INDEX_BATCH_SIZE = 16
 
 # below are intended to match the env variables names used by the official postgres docker image
 # https://hub.docker.com/_/postgres
