@@ -94,6 +94,9 @@ def make_slack_api_rate_limited(
                 else:
                     # Raise the error for non-transient errors
                     raise
+            except TimeoutError as e:
+                logger.info(f"Slack call timed out, retrying. Exception: {e}")
+                time.sleep(3)
 
         # If the code reaches this point, all retries have been exhausted
         raise Exception(f"Max retries ({max_retries}) exceeded")
