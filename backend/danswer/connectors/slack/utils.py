@@ -67,7 +67,7 @@ def make_slack_api_call_paginated(
 
 
 def make_slack_api_rate_limited(
-    call: Callable[..., SlackResponse], max_retries: int = 3
+    call: Callable[..., SlackResponse], max_retries: int = 10
 ) -> Callable[..., SlackResponse]:
     """Wraps calls to slack API so that they automatically handle rate limiting"""
 
