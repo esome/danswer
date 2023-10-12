@@ -12,6 +12,7 @@ from slack_sdk.errors import SlackApiError
 from slack_sdk.web import SlackResponse
 
 from danswer.configs.app_configs import INDEX_BATCH_SIZE
+from danswer.configs.app_configs import SLACK_CONNECTOR_MAX_BATCHES
 from danswer.configs.constants import DocumentSource
 from danswer.connectors.interfaces import GenerateDocumentsOutput
 from danswer.connectors.interfaces import LoadConnector
@@ -35,6 +36,8 @@ MessageType = dict[str, Any]
 # list of messages in a thread
 ThreadType = list[MessageType]
 
+LOAD_STATE_KEY = "slack_connector_state"
+MAX_BATCHES = SLACK_CONNECTOR_MAX_BATCHES
 
 def _make_paginated_slack_api_call(
     call: Callable[..., SlackResponse], **kwargs: Any
@@ -221,9 +224,8 @@ def _filter_channels(
 def get_all_docs(
     client: WebClient,
     workspace: str,
+    state: dict[str, dict[str, Any]],
     channels: list[str] | None = None,
-    oldest: str | None = None,
-    latest: str | None = None,
     msg_filter_func: Callable[[MessageType], bool] = _default_msg_filter,
 ) -> Generator[Document, None, None]:
     """Get all documents in the workspace, channel by channel"""
@@ -234,13 +236,43 @@ def get_all_docs(
 
     for channel in filtered_channels:
         channel_docs = 0
+
+        if channel["id"] in state:
+            channel_state = state[channel["id"]]
+        else:
+            channel_state = {
+                "name": channel["name"],
+                "oldest": None,
+                "latest": None,
+                "initial": True,
+            }
+            state[channel["id"]] = channel_state
+
+        initial = channel_state["initial"]
+
+        # If we're doing an initial import, we go backwards until we have
+        # imported all messages from the channel. Afterwards, we only pull
+        # messages that are newer than the latest message we've seen.
+        if initial:
+            oldest = None
+            latest = channel_state["oldest"]
+            logger.info(f'Running initial import of channel #{channel["name"]}: oldest={oldest}, latest={latest}')
+        else:
+            oldest = channel_state["latest"]
+            latest = None
+            logger.info(f'Running incremental import of channel #{channel["name"]}: oldest={oldest}, latest={latest}')
+
         channel_message_batches = get_channel_messages(
             client=client, channel=channel, oldest=oldest, latest=latest
         )
 
+        latest_ts = None
         seen_thread_ts: set[str] = set()
         for message_batch in channel_message_batches:
             for message in message_batch:
+                if latest_ts is None:
+                    latest_ts = message["ts"]
+
                 filtered_thread: ThreadType | None = None
                 thread_ts = message.get("thread_ts")
                 if thread_ts:
@@ -260,16 +292,27 @@ def get_all_docs(
 
                 if filtered_thread:
                     channel_docs += 1
-                    yield thread_to_doc(
+                    doc = thread_to_doc(
                         workspace=workspace,
                         channel=channel,
                         thread=filtered_thread,
                         slack_cleaner=slack_cleaner,
                     )
+                    text_length = sum(map(lambda sec: len(sec.text), doc.sections))
+                    if text_length != 0:
+                        yield doc
+                    if initial:
+                        channel_state["oldest"] = message["ts"]
+                        if channel_state["latest"] is None:
+                            channel_state["latest"] = message["ts"]
+                    else:
+                        channel_state["latest"] = latest_ts
 
         logger.info(
             f"Pulled {channel_docs} documents from slack channel {channel['name']}"
         )
+
+        channel_state["initial"] = False
 
 
 class SlackLoadConnector(LoadConnector):
@@ -401,24 +444,37 @@ class SlackPollConnector(PollConnector):
         if self.client is None:
             raise ConnectorMissingCredentialError("Slack")
 
+        try:
+            state = cast(dict, get_dynamic_config_store().load(LOAD_STATE_KEY))
+        except ConfigNotFoundError:
+            state = {}
+
+        if "channels" not in state:
+            state["channels"] = {}
+        channels_state = state["channels"]
+
         documents: list[Document] = []
+        num_batches = 0
         for document in get_all_docs(
             client=self.client,
             workspace=self.workspace,
             channels=self.channels,
-            # NOTE: need to impute to `None` instead of using 0.0, since Slack will
-            # throw an error if we use 0.0 on an account without infinite data
-            # retention
-            oldest=str(start) if start else None,
-            latest=str(end),
+            state=channels_state,
         ):
             documents.append(document)
             if len(documents) >= self.batch_size:
+                logger.info(f"Yielding batch {num_batches + 1} of {self.batch_size} documents")
                 yield documents
                 documents = []
+                num_batches += 1
+                if num_batches >= MAX_BATCHES:
+                    logger.info(f"Reached max batches of {MAX_BATCHES}, stopping")
+                    break
 
         if documents:
             yield documents
+
+        get_dynamic_config_store().store(LOAD_STATE_KEY, cast(JSON_ro, state))
 
 
 if __name__ == "__main__":

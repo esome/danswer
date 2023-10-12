@@ -130,6 +130,12 @@ try:
     DIRECTORY_CONNECTOR_MAX_BATCHES = int(os.environ.get("DIRECTORY_CONNECTOR_MAX_BATCHES", "5"))
 except TypeError as e:
     DIRECTORY_CONNECTOR_MAX_BATCHES = 5
+
+try:
+    SLACK_CONNECTOR_MAX_BATCHES = int(os.environ.get("SLACK_CONNECTOR_MAX_BATCHES", "5"))
+except TypeError as e:
+    SLACK_CONNECTOR_MAX_BATCHES = 5
+
 # TODO these should be available for frontend configuration, via advanced options expandable
 WEB_CONNECTOR_IGNORED_CLASSES = os.environ.get(
     "WEB_CONNECTOR_IGNORED_CLASSES", "sidebar,footer"
