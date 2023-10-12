@@ -94,7 +94,10 @@ VESPA_DEPLOYMENT_ZIP = (
     os.environ.get("VESPA_DEPLOYMENT_ZIP") or "/app/danswer/vespa-app.zip"
 )
 # Number of documents in a batch during indexing (further batching done by chunks before passing to bi-encoder)
-INDEX_BATCH_SIZE = 16
+try:
+    INDEX_BATCH_SIZE = int(os.environ.get("INDEX_BATCH_SIZE", "16"))
+except TypeError as e:
+    INDEX_BATCH_SIZE = 16
 
 # Below are intended to match the env variables names used by the official postgres docker image
 # https://hub.docker.com/_/postgres
