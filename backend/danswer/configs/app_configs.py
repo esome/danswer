@@ -126,6 +126,10 @@ FILE_CONNECTOR_TMP_STORAGE_PATH = os.environ.get(
 )
 
 DIRECTORY_CONNECTOR_PATH = os.environ.get("DIRECTORY_CONNECTOR_PATH", "/data")
+try:
+    DIRECTORY_CONNECTOR_MAX_BATCHES = int(os.environ.get("DIRECTORY_CONNECTOR_MAX_BATCHES", "5"))
+except TypeError as e:
+    DIRECTORY_CONNECTOR_MAX_BATCHES = 5
 # TODO these should be available for frontend configuration, via advanced options expandable
 WEB_CONNECTOR_IGNORED_CLASSES = os.environ.get(
     "WEB_CONNECTOR_IGNORED_CLASSES", "sidebar,footer"

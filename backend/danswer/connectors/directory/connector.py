@@ -8,6 +8,7 @@ from typing import IO
 
 from danswer.configs.app_configs import INDEX_BATCH_SIZE
 from danswer.configs.app_configs import DIRECTORY_CONNECTOR_PATH
+from danswer.configs.app_configs import DIRECTORY_CONNECTOR_MAX_BATCHES
 from danswer.configs.constants import DocumentSource
 from danswer.connectors.file.utils import get_file_ext
 from danswer.connectors.interfaces import GenerateDocumentsOutput
@@ -25,7 +26,7 @@ logger = setup_logger()
 _METADATA_FLAG = "#DANSWER_METADATA="
 
 LOAD_STATE_KEY = "directory_connector_state"
-MAX_BATCHES = 5
+MAX_BATCHES = DIRECTORY_CONNECTOR_MAX_BATCHES
 MAX_FILE_SIZE = 1 * 1024 * 1024 # 1 MB
 
 def _open_files_at_location_recursive(
