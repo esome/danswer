@@ -9,6 +9,7 @@ from distributed import LocalCluster
 from sqlalchemy.orm import Session
 
 from danswer.configs.app_configs import NUM_INDEXING_WORKERS
+from danswer.configs.app_configs import CONNECTOR_REFRESH_FREQ_OVERRIDE
 from danswer.connectors.factory import instantiate_connector
 from danswer.connectors.interfaces import GenerateDocumentsOutput
 from danswer.connectors.interfaces import LoadConnector
@@ -56,7 +57,8 @@ def should_create_new_indexing(
         return True
     current_db_time = get_db_current_time(db_session)
     time_since_index = current_db_time - last_index.time_updated
-    return time_since_index.total_seconds() >= 60 # connector.refresh_freq
+    refresh_freq = CONNECTOR_REFRESH_FREQ_OVERRIDE or connector.refresh_freq
+    return time_since_index.total_seconds() >= refresh_freq
 
 
 def mark_run_failed(
