@@ -178,7 +178,7 @@ def cleanup_indexing_jobs(
                 # batch of documents indexed
                 current_db_time = get_db_current_time(db_session=db_session)
                 time_since_update = current_db_time - index_attempt.time_updated
-                if time_since_update.total_seconds() > 60 * 60:
+                if time_since_update.seconds > 3 * 60 * 60:
                     existing_jobs[index_attempt.id].cancel()
                     mark_run_failed(
                         db_session=db_session,
