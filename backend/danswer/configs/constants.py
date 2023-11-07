@@ -49,6 +49,7 @@ class DocumentSource(str, Enum):
     JIRA = "jira"
     PRODUCTBOARD = "productboard"
     FILE = "file"
+    DIRECTORY = "directory"
     NOTION = "notion"
     ZULIP = "zulip"
     LINEAR = "linear"

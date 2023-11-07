@@ -19,9 +19,10 @@ export type ValidSources =
   | "slab"
   | "notion"
   | "guru"
-  | "gong"
   | "zulip"
   | "linear"
+  | "file";
+  | "directory"
   | "hubspot"
   | "document360"
   | "file"
@@ -108,6 +109,9 @@ export interface GongConfig {
 
 export interface FileConfig {
   file_locations: string[];
+}
+
+export interface DirectoryConfig {
 }
 
 export interface ZulipConfig {

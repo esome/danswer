@@ -11,6 +11,7 @@ import {
   ConfluenceIcon,
   GuruIcon,
   FileIcon,
+  DirectoryIcon,
   JiraIcon,
   SlabIcon,
   NotionIcon,
@@ -240,6 +241,15 @@ export async function Layout({ children }: { children: React.ReactNode }) {
                     </div>
                   ),
                   link: "/admin/connectors/zendesk",
+                },
+                {
+                  name: (
+                    <div className="flex">
+                      <DirectoryIcon size={16} />
+                      <div className="ml-1">Directory</div>
+                    </div>
+                  ),
+                  link: "/admin/connectors/directory",
                 },
               ],
             },

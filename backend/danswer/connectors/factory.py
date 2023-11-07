@@ -7,6 +7,7 @@ from danswer.connectors.confluence.connector import ConfluenceConnector
 from danswer.connectors.danswer_jira.connector import JiraConnector
 from danswer.connectors.document360.connector import Document360Connector
 from danswer.connectors.file.connector import LocalFileConnector
+from danswer.connectors.directory.connector import LocalDirectoryConnector
 from danswer.connectors.github.connector import GithubConnector
 from danswer.connectors.gong.connector import GongConnector
 from danswer.connectors.google_drive.connector import GoogleDriveConnector
@@ -40,6 +41,7 @@ def identify_connector_class(
     connector_map = {
         DocumentSource.WEB: WebConnector,
         DocumentSource.FILE: LocalFileConnector,
+        DocumentSource.DIRECTORY: LocalDirectoryConnector,
         DocumentSource.SLACK: {
             InputType.LOAD_STATE: SlackLoadConnector,
             InputType.POLL: SlackPollConnector,

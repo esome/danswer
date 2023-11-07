@@ -3,6 +3,7 @@ import {
   BookstackIcon,
   ConfluenceIcon,
   FileIcon,
+  DirectoryIcon,
   GithubIcon,
   GlobeIcon,
   GoogleDriveIcon,
@@ -40,6 +41,12 @@ export const getSourceMetadata = (sourceType: ValidSources): SourceMetadata => {
         icon: FileIcon,
         displayName: "File",
         adminPageLink: "/admin/connectors/file",
+      };
+    case "directory":
+      return {
+        icon: DirectoryIcon,
+        displayName: "Directory",
+        adminPageLink: "/admin/connectors/directory",
       };
     case "slack":
       return {
