@@ -111,6 +111,13 @@ POSTGRES_DB = os.environ.get("POSTGRES_DB") or "postgres"
 #####
 # Connector Configs
 #####
+try:
+    CONNECTOR_REFRESH_FREQ_OVERRIDE = int(os.environ.get("CONNECTOR_REFRESH_FREQ_OVERRIDE", "0"))
+    if CONNECTOR_REFRESH_FREQ_OVERRIDE < 0:
+        CONNECTOR_REFRESH_FREQ_OVERRIDE = None
+except TypeError as e:
+    CONNECTOR_REFRESH_FREQ_OVERRIDE = None
+
 GOOGLE_DRIVE_INCLUDE_SHARED = False
 GOOGLE_DRIVE_FOLLOW_SHORTCUTS = False
 
