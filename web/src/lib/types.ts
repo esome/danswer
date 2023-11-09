@@ -19,9 +19,9 @@ export type ValidSources =
   | "slab"
   | "notion"
   | "guru"
+  | "gong"
   | "zulip"
   | "linear"
-  | "file";
   | "directory"
   | "hubspot"
   | "document360"
