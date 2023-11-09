@@ -16,6 +16,7 @@ from danswer.configs.app_configs import EXPERIMENTAL_SIMPLE_JOB_CLIENT_ENABLED
 from danswer.configs.app_configs import MODEL_SERVER_HOST
 from danswer.configs.app_configs import NUM_INDEXING_WORKERS
 from danswer.configs.model_configs import MIN_THREADS_ML_MODELS
+from danswer.configs.app_configs import CONNECTOR_REFRESH_FREQ_OVERRIDE
 from danswer.db.connector import fetch_connectors
 from danswer.db.connector_credential_pair import mark_all_in_progress_cc_pairs_failed
 from danswer.db.connector_credential_pair import update_connector_credential_pair
