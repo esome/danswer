@@ -1,4 +1,5 @@
 import nltk  # type:ignore
+import os
 import torch
 import uvicorn
 from fastapi import FastAPI
@@ -199,9 +200,10 @@ def get_application() -> FastAPI:
         get_default_qa_model().warm_up_model()
 
         logger.info("Verifying query preprocessing (NLTK) data is downloaded")
-        nltk.download("stopwords", quiet=True)
-        nltk.download("wordnet", quiet=True)
-        nltk.download("punkt", quiet=True)
+        nltk_data_dir = os.getenv("NLTK_DATA", None)
+        nltk.download("stopwords", download_dir=nltk_data_dir, quiet=False)
+        nltk.download("wordnet", download_dir=nltk_data_dir, quiet=False)
+        nltk.download("punkt", download_dir=nltk_data_dir, quiet=False)
 
         logger.info("Verifying public credential exists.")
         create_initial_public_credential()
