@@ -39,11 +39,13 @@ def _open_files_at_location_recursive(
         if file.is_dir(follow_symlinks=False):
             yield from _open_files_at_location_recursive(base_path, rel_file_path)
         elif not file.is_symlink():
+            # FIXME: Move this outside; to avoid stat()ing already processed files
             if file.stat().st_size > MAX_FILE_SIZE:
                 logger.warning(f"Skipping file '{abs_file_path}' as it is too large")
                 continue
             extension = get_file_ext(file.name)
             if extension == ".txt":
+                # FIXME: Move this outside; to avoid opening already processed files
                 with open(abs_file_path, "r", encoding = "utf8") as fd:
                     yield str(rel_file_path), fd
             else:
@@ -97,6 +99,7 @@ class LocalDirectoryConnector(LoadConnector):
 
             for file_name, file in files:
                 file_path = os.path.join(file_location, file_name)
+                # TODO: Check if file has been modified since last time
                 if file_path in state:
                     logger.debug(f"Skipping file '{file_path}' as it has already been processed")
                     continue
